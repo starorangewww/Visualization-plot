@@ -1,0 +1,22 @@
+Guidance of Visualization-plot:
+
+File type: .csv
+
+1.Make sure your package is latest on running shiny progam.
+2.Make sure your group number of drugs.
+3.Make sure your replicated number of each group.
+
+Data format:
+Since our demo data is transforred by internal drug, we suggest your input data is also done by internal drug.  
+The format of input data must be same with the format of demo data. The columns of input data have two label columns and column of main dataset, 
+the first label column is known ID of drug, which needs to include internal drug, second label column is sequence number.
+
+If user has any common or question, the address can be connect our group:
+starorangewww@gmail.com
+
+Best regard 
+ 
+
+Yu-Yi Pan
+
+
