@@ -1,5 +1,5 @@
 Guidance of Visualization-plot: 
-Demo data isn't real data, and it just show the fomat of inputing data.  
+Demo data isn't real data, and it just make user understand the fomat of inputing data.  
 
 File type: .csv
 
