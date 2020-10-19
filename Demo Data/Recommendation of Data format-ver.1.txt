@@ -1,5 +1,5 @@
 Guidance of Visualization-plot: 
-Demo data isn't real data, and it just make user understand the fomat of inputing data.  
+Demo data isn't real data, and it just make users understand the format of inputting data.  
 
 File type: .csv
 
@@ -9,8 +9,8 @@ File type: .csv
 
 Data format:
 Since our demo data is transforred by internal drug, we suggest your input data is also done by internal drug.  
-The format of input data must be same with the format of demo data. The columns of input data have two label columns and column of main dataset, 
-the first label column is known ID of drug, which needs to include internal drug, second label column is sequence number.
+The format of inputting data must be same with the format of demo data. The columns of input data have two label columns and column of main dataset, 
+the first label column is known ID of drug, which needs to include internal standard drug, second label column is sequence number.
 
 If user has any common or question, the address can be connect our group:
 starorangewww@gmail.com
