@@ -3,7 +3,7 @@ Demo data isn't real data, and it just make users understand the format of input
 
 File type: .csv
 
-1.Make sure your package is latest on running shiny progam.
+1.Make sure your package is latest on running shiny program.
 2.Make sure your group number of drugs.
 3.Make sure your replicated number of each group.
 
