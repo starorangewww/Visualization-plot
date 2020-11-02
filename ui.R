@@ -35,6 +35,7 @@ shinyUI(
         selectInput("Method",label="Cutting point of x,Null:No cut point",
                     choices = list("Null",
                                    "Bonferroni's adjustment",
+                                   "BH_FDR",
                                    "Logistic regression",
                                    "Support vector machine",
                                    "Arifical neural network",

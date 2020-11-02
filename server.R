@@ -4,6 +4,7 @@ library(httpuv)
 library(Rcpp)
 library(rsconnect)
 library(varhandle)
+library(stats)
 #library(ropls) bio
 library(car)
 library(ggplot2)
@@ -65,6 +66,8 @@ shinyServer(
           if(L$`Pr(>F)`[1]>0.05){ANOVA.f<-oneway.test(Con~Drug.level,my.dataframe,var.equal=T);X.axis.p<-c(X.axis.p,ANOVA.f$p.value)}else{
             ANOVA.f<-oneway.test(Con~Drug.level,my.dataframe,var.equal=F);X.axis.p<-c(X.axis.p,ANOVA.f$p.value)
           }}
+        X.axis.fdr<-p.adjust(X.axis.p,method="BH")
+        X.axis.fdr.10<-(-log(X.axis.fdr,base=10))
         X.axis.p.10<-(-log(X.axis.p,base=10))
       }else{if(y.type=="Univariate:Non-parametric"){
         X.axis.kw.p<-c()
@@ -80,12 +83,16 @@ shinyServer(
           data.plot.con.t.1[,1]<-as.factor(data.plot.con.t.1[,1])
           RL<-randomForest(durg.c~.,data.plot.con.t.1)
           U<-RL$importance
-          X.axis.p.10<-U[,1]
+          X.axis.imp<-U[,1]
         }
         
       }
       #plot 
-      D1<-data.frame(X.P=X.axis.p.10,COR=Y.axis)
+      if(x.Cor.cut=="BH_FDR"){
+      D1<-data.frame(X.P=X.axis.p.10,COR=Y.axis,X.fdr=X.axis.fdr.10)}else{
+        if(y.type=="Multivairate:Importance wetight"){D1<-data.frame(X.P=X.axis.imp,COR=Y.axis)}else{
+          
+          D1<-data.frame(X.P=X.axis.p.10,COR=Y.axis)}}
       if(length(which(D1$X.P=="NaN"))>0){
         D1.1<-D1[-which(D1$X.P=="NaN"),]
         D1.1$ID<-ifelse(data.plot.feature[-which(D1$X.P=="NaN"),1]!="","Y","N")}else{
@@ -99,28 +106,29 @@ shinyServer(
       D1.1<-datasetInput()[[1]]
       x.C<-datasetInput()[[3]]
       if(x.C=="Null"){x.p<-0}else{
-        if(x.C=="Bonferroni's adjustment"){x.p<-c(-log(0.05/dim(D1.1)[1],10))}else{
-          if(x.C=="Logistic regression"){x.1<-glm(relevel(factor(ID),ref="N")~.,data=D1.1,family=binomial(link="logit"))
+        if(x.C=="Bonferroni's adjustment"){x.p<-c(-log(0.05/dim(D1.1)[1],10))}else{if(x.C=="BH_FDR"){
+          x.p<-c(-log(0.05,10))}else{
+          if(x.C=="Logistic regression"){x.1<-glm(relevel(factor(ID),ref="N")~X.P+COR,data=D1.1,family=binomial(link="logit"))
           D1.1$Predict<-ifelse(x.1$fitted.values>0.5,1,0)
           x.p<-min(D1.1[which(D1.1$Predict==1),1])}else{
             if(x.C=="Support vector machine"){
-              x.svm<-svm(factor(ID)~.,data=D1.1)
+              x.svm<-svm(factor(ID)~X.P+COR,data=D1.1)
               train.pred<-predict(x.svm,D1.1)
               x.p<-min(D1.1[which(train.pred=="Y"),1])}else{
                 if(x.C=="Arifical neural network"){
-                  bpn<-neuralnet(formula=factor(ID)~.,data=D1.1)
+                  bpn<-neuralnet(formula=factor(ID)~X.P+COR,data=D1.1)
                   pred<-compute(bpn,D1.1[,1:2])  
                   x.p4<-round(pred$net.result)
                   x.p4.nn<-ifelse(x.p4[,1]==1,"N","Y")
                   x.p<-min(D1.1[which(x.p4.nn=="Y"),1])
                 }else{
-                  RL<-randomForest(factor(ID)~.,data=D1.1)
+                  RL<-randomForest(factor(ID)~X.P+COR,data=D1.1)
                   meta.pred<-predict(RL,D1.1)
                   x.p<-min(D1.1[which(meta.pred=="Y"),1])}
               }
           }
         }
-      }
+      }}
       return(X.p=x.p)
     })
     
@@ -142,10 +150,16 @@ shinyServer(
             labs(x="importance value by random forest",y="Correlation")+
             theme(axis.text=element_text(size=25),axis.title=element_text(size=20,face="bold"))}
       }else{
+        if(x.C=="BH_FDR"){
+          V.1<-ggplot(V,aes(x=X.fdr,y=COR))+geom_point()+
+            labs(x=expression(-log[10]*FDR),y="Correlation")+
+            theme(axis.text=element_text(size=25),axis.title=element_text(size=20,face="bold"))+geom_hline(aes(yintercept=y.C))+
+            geom_vline(aes(xintercept=x.p))
+        }else{
         V.1<-ggplot(V,aes(x=X.P,y=COR))+geom_point()+
           labs(x=expression(-log[10]*p.value),y="Correlation")+
           theme(axis.text=element_text(size=25),axis.title=element_text(size=20,face="bold"))+geom_hline(aes(yintercept=y.C))+
-          geom_vline(aes(xintercept=x.p))
+          geom_vline(aes(xintercept=x.p))}
       }
       return(V.1)
     })
