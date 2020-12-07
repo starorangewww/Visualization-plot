@@ -18,10 +18,11 @@ shinyUI(
     titlePanel(h3("Visualization plot of statistically processed")),sidebarLayout(
       sidebarPanel(
         fileInput("file",label="File input"),
-        textInput("IS",label = "Feature of internal standard",value="38"),
-        textInput("PD",label = "Feature of parent drug",value="5"),
+        textInput("IS",label = "Feature number of internal standard",value="38"),
+        textInput("PD",label = "Feature number of parent drug",value="5"),
         textInput("G.S",label = "Group size",value="6"),
         textInput("R.S",label="Replicated size", value = "5"),
+        textInput("sign",label="Threshold value", value = "0.05"),
         div("--------------------------------------------------"),
         selectInput("Ty", 
                     label = h4("Type of vizualization"),
@@ -29,6 +30,8 @@ shinyUI(
                                    "Univariate:Non-parametric",
                                    "Multivairate:Importance wetight"),
                     selected = "Type"),
+        h5("Cutting decision for Parametric: Bonfferroni's adjust, and BH_FDR"),
+        h5("Cutting decision for Non-Parametric:LR, SVM, ANN, and RF"),
         div("--------------------------------------------------"),
         selectInput("Cor.1",label = "Type of correlation",choices = list("pearson","spearman","kendall")),
         textInput("Cor",label = "Cutting point of y,99:No cut point",value="99"),
